@@ -1,0 +1,13 @@
+# Claude Code 로컬 설정 — 승인한 명령어(비밀번호·API 키가 들어간 명령 포함)가 평문으로 저장됨
+.claude/settings.local.json
+CLAUDE.local.md
+
+# 환경변수·비밀키 파일
+.env
+.env.*
+*.pem
+*.key
+
+# OS 잡파일
+.DS_Store
+Thumbs.db
