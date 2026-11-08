@@ -1,0 +1,9 @@
+# DS build output
+ds/build/
+ds/*.nds
+ds/tests/build/
+# ESP32 build output
+esp32/**/build/
+# Python
+__pycache__/
+*.pyc

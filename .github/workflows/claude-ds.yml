@@ -1,0 +1,88 @@
+name: claude-ds
+
+# Builds and tests the Claude DS project (claude-ds/):
+#  - the PC bridge (Python) and the DS app's portable code (host C tests)
+#  - the Nintendo DS ROM (BlocksDS)              -> artifact "claude-ds-nds"
+#  - the ESP32 Wi-Fi dongle firmware (Arduino)   -> artifacts "claude-ds-esp32*"
+
+on:
+  push:
+    paths:
+      - "claude-ds/**"
+      - ".github/workflows/claude-ds.yml"
+  pull_request:
+    paths:
+      - "claude-ds/**"
+      - ".github/workflows/claude-ds.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install optional dependencies
+        run: pip install pyserial psutil
+      - name: Unit + integration tests
+        working-directory: claude-ds/bridge
+        run: python -m unittest discover -s tests -v
+
+  ds-host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Protocol / config / layout tests (host compiler)
+        run: make -C claude-ds/ds/tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-ds-screens
+          path: claude-ds/ds/tests/build/screens.txt
+
+  nds-rom:
+    runs-on: ubuntu-latest
+    container: skylyrac/blocksds:slim-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build claude-ds.nds
+        run: make -C claude-ds/ds
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-ds-nds
+          path: claude-ds/ds/claude-ds.nds
+
+  esp32-firmware:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - board: esp32
+            fqbn: esp32:esp32:esp32
+          - board: esp32c3
+            fqbn: esp32:esp32:esp32c3:CDCOnBoot=cdc
+    env:
+      ESP32_INDEX: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Install the ESP32 core
+        run: |
+          arduino-cli core update-index --additional-urls "$ESP32_INDEX"
+          arduino-cli core install esp32:esp32 --additional-urls "$ESP32_INDEX"
+      - name: Compile
+        run: |
+          arduino-cli compile --fqbn "${{ matrix.fqbn }}" \
+            --output-dir "build/${{ matrix.board }}" claude-ds/esp32/claude_ds_ap
+          ls -la "build/${{ matrix.board }}"
+          cp "build/${{ matrix.board }}/claude_ds_ap.ino.merged.bin" \
+             "build/claude-ds-${{ matrix.board }}-flash-at-0x0.bin"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-ds-${{ matrix.board }}-firmware
+          path: build/claude-ds-${{ matrix.board }}-flash-at-0x0.bin
