@@ -57,7 +57,7 @@ STALE_WORK_S = 30 * 60       # "working" with no activity for this long -> idle
 NAME_MAX = 14
 TOOL_MAX = 20
 DETAIL_MAX = 180
-MAX_ROWS = 6
+MAX_ROWS = 5  # session rows shown on the DS (matches MAX_ROWS in ds/source/proto.h)
 
 # USB vendor ids of the USB-serial chips found on ESP32 boards.
 KNOWN_USB_VIDS = {

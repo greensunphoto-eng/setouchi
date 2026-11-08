@@ -304,6 +304,7 @@ static void send_hello(void)
 
 static void start_scan(void)
 {
+    Wifi_EnableWifi();
     Wifi_ScanMode();
     net.target_seen = 0;
     net.target_compatible = 0;
