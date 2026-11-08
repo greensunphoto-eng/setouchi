@@ -102,6 +102,8 @@ def start_hook(http_port, payload):
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     proc.stdin.write(json.dumps(payload).encode("utf-8"))
     proc.stdin.close()
+    # communicate() would flush the closed pipe on Python <= 3.12 and fail.
+    proc.stdin = None
     return proc
 
 

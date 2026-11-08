@@ -346,14 +346,14 @@ static void scan_step(void)
                 seen--;
             memmove(net.seen_ssid[1], net.seen_ssid[0], sizeof(net.seen_ssid[0]) * seen);
             memmove(net.seen_sec[1], net.seen_sec[0], sizeof(net.seen_sec[0]) * seen);
-            snprintf(net.seen_ssid[0], sizeof(net.seen_ssid[0]), "%s", ap.ssid);
+            snprintf(net.seen_ssid[0], sizeof(net.seen_ssid[0]), "%.20s", ap.ssid);
             snprintf(net.seen_sec[0], sizeof(net.seen_sec[0]), "%s",
                      security_label(ap.security_type));
             seen++;
         }
         else if (!is_target && seen < SEEN_MAX)
         {
-            snprintf(net.seen_ssid[seen], sizeof(net.seen_ssid[0]), "%s", ap.ssid);
+            snprintf(net.seen_ssid[seen], sizeof(net.seen_ssid[0]), "%.20s", ap.ssid);
             snprintf(net.seen_sec[seen], sizeof(net.seen_sec[0]), "%s",
                      security_label(ap.security_type));
             seen++;

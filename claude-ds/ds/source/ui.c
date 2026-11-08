@@ -349,7 +349,7 @@ static void draw_sessions(Grid *g, const Model *m, const NetInfo *n, uint32_t fr
     }
     if (m->rows_total > m->rows_shown)
     {
-        char buf[16];
+        char buf[24];
         snprintf(buf, sizeof(buf), "+%d more", m->rows_total - m->rows_shown);
         right(g, 32, 18, buf, C_GRAY);
     }

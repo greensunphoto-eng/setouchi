@@ -806,7 +806,13 @@ class SerialLink(threading.Thread):
         arg = parts[1].upper() if len(parts) > 1 else ""
         if tag == "#ESP" and arg == "READY":
             ssid = parts[2] if len(parts) > 2 else "?"
-            log("ESP32 준비됨 - 와이파이 이름: %s" % ssid)
+            fields = dict(p.split("=", 1) for p in parts[3:] if "=" in p)
+            log("ESP32 준비됨 - 와이파이 이름: %s (펌웨어 %s, 등록된 DS: %s)" % (
+                ssid, parts[3] if len(parts) > 3 and "=" not in parts[3] else "?",
+                fields.get("paired", "?")))
+            if fields.get("proto") not in (None, "0x1"):
+                log("경고: ESP32 와이파이가 802.11b 전용이 아닙니다 (proto=%s). "
+                    "원조 DS가 접속하지 못할 수 있어요." % fields.get("proto"))
         elif tag == "#DS" and arg == "UP":
             log("DS가 ESP32 와이파이에 접속함 (%s)" % (parts[2] if len(parts) > 2 else "?"))
         elif tag == "#DS" and arg == "DOWN":

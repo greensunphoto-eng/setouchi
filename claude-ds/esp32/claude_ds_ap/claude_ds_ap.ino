@@ -28,7 +28,7 @@ static const int AP_CHANNEL = 6;
 static const int AP_MAX_STATIONS = 2;       // the DS (+1 slot for a stale entry)
 static const uint16_t TCP_PORT = 7777;
 static const uint32_t SERIAL_BAUD = 115200;
-static const size_t LINE_MAX = 300;
+static const size_t RELAY_LINE_MAX = 300;
 
 // ---- state ------------------------------------------------------------------
 
@@ -51,9 +51,9 @@ static StaEvent evQueue[8];
 static volatile int evHead = 0;
 static volatile int evTail = 0;
 
-static char serialLine[LINE_MAX + 2];
+static char serialLine[RELAY_LINE_MAX + 2];
 static size_t serialLen = 0;
-static char clientLine[LINE_MAX + 2];
+static char clientLine[RELAY_LINE_MAX + 2];
 static size_t clientLen = 0;
 
 // ---- helpers ----------------------------------------------------------------
@@ -164,7 +164,7 @@ static void handleSerial() {
             continue;
         }
         if (c != '\n') {
-            if (serialLen < LINE_MAX) {
+            if (serialLen < RELAY_LINE_MAX) {
                 serialLine[serialLen++] = (char)c;
             }
             continue;
@@ -216,7 +216,7 @@ static void handleClient() {
             continue;
         }
         if (c != '\n') {
-            if (clientLen < LINE_MAX) {
+            if (clientLen < RELAY_LINE_MAX) {
                 clientLine[clientLen++] = (char)c;
             }
             continue;
